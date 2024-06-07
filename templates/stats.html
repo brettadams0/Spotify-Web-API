@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Spotify Stats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Your Spotify Stats</h1>
+            <br>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('stats', time_range=time_range, section='profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('stats', time_range=time_range, section='artists') }}">Top Artists</a></li>
+                <li><a href="{{ url_for('stats', time_range=time_range, section='tracks') }}">Top Tracks</a></li>
+                <li><a href="{{ url_for('stats', time_range=time_range, section='genres') }}">Top Genres</a></li>
+                <li><a href="{{ url_for('stats', time_range=time_range, section='playlists') }}">Playlists</a></li>
+            </ul>
+        </nav>
+
+        <section class="content">
+            {% if section == 'profile' %}
+            
+            <div class="user-profile">
+                <br>
+                <h2>Welcome to Your Spotify Stats!</h2>
+                <p>Discover your music listening habits with our interactive tool.</p>
+                <p>Explore your top artists, tracks, genres, playlists, and more.</p>
+                <p>Simply click on the navigation links above to get started!</p>
+                <br>
+                <h2>User Profile</h2>
+                <p><strong>Display Name:</strong> {{ user_profile.display_name }}</p>
+                <p><strong>Email:</strong> {{ user_profile.email }}</p>
+                <p><strong>Country:</strong> {{ user_profile.country }}</p>
+                <p><strong>Followers:</strong> {{ user_profile.followers.total }}</p>
+                <br>
+                <br>
+            </div>
+            {% elif section == 'artists' %}
+            <div class="top-artists">
+                <h2>Your Top Artists</h2>
+                <br>
+                <div class="time-range-buttons">
+                    <form action="{{ url_for('stats') }}" method="GET">
+                        <input type="hidden" name="section" value="{{ section }}">
+                        <button type="submit" name="time_range" value="short_term" {% if time_range == 'short_term' %}class="active"{% endif %}>4 Weeks</button>
+                        <button type="submit" name="time_range" value="medium_term" {% if time_range == 'medium_term' %}class="active"{% endif %}>3 Months</button>
+                        <button type="submit" name="time_range" value="long_term" {% if time_range == 'long_term' %}class="active"{% endif %}>All Time</button>
+                    </form>
+                </div>
+                <ul>
+                    {% for artist in top_artists['items'] %}
+                    <li>
+                        <img src="{{ artist['images'][0]['url'] }}" alt="{{ artist['name'] }}">
+                        {{ loop.index }}. {{ artist['name'] }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% elif section == 'tracks' %}
+            <div class="top-tracks">
+                <h2>Your Top Tracks</h2>
+                <br>
+                <div class="time-range-buttons">
+                    <form action="{{ url_for('stats') }}" method="GET">
+                        <input type="hidden" name="section" value="{{ section }}">
+                        <button type="submit" name="time_range" value="short_term" {% if time_range == 'short_term' %}class="active"{% endif %}>4 Weeks</button>
+                        <button type="submit" name="time_range" value="medium_term" {% if time_range == 'medium_term' %}class="active"{% endif %}>3 Months</button>
+                        <button type="submit" name="time_range" value="long_term" {% if time_range == 'long_term' %}class="active"{% endif %}>All Time</button>
+                    </form>
+                </div>
+                <ul>
+                    {% for track in top_tracks['items'] %}
+                    <li>
+                        <img src="{{ track['album']['images'][0]['url'] }}" alt="{{ track['name'] }}">
+                        {{ loop.index }}. {{ track['name'] }} by {{ track['artists'][0]['name'] }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% elif section == 'genres' %}
+            <div class="top-genres">
+                <h2>Your Top Genres</h2>
+                <ul>
+                    {% for genre, count in top_genres %}
+                    <li>{{ loop.index }}. {{ genre }} ({{ count }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% elif section == 'playlists' %}
+            <div class="playlists">
+                <h2>Your Playlists</h2>
+                <ul>
+                    {% for playlist in playlists['items'] %}
+                    <li>{{ loop.index }}. {{ playlist['name'] }} ({{ playlist['tracks']['total'] }} tracks)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
