@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Stats Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fab fa-spotify"></i>
+                    <span>Spotify Stats</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" data-section="overview">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#artists" class="nav-item" data-section="artists">
+                    <i class="fas fa-microphone"></i>
+                    <span>Top Artists</span>
+                </a>
+                <a href="#tracks" class="nav-item" data-section="tracks">
+                    <i class="fas fa-music"></i>
+                    <span>Top Tracks</span>
+                </a>
+                <a href="#genres" class="nav-item" data-section="genres">
+                    <i class="fas fa-tags"></i>
+                    <span>Genres</span>
+                </a>
+                <a href="#audio" class="nav-item" data-section="audio">
+                    <i class="fas fa-waveform"></i>
+                    <span>Audio Analysis</span>
+                </a>
+                <a href="#recent" class="nav-item" data-section="recent">
+                    <i class="fas fa-clock"></i>
+                    <span>Recent Activity</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    {% if user_profile.images %}
+                    <img src="{{ user_profile.images[0].url }}" alt="{{ user_profile.display_name }}" class="user-avatar">
+                    {% else %}
+                    <div class="user-avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    {% endif %}
+                    <div class="user-info">
+                        <h4>{{ user_profile.display_name }}</h4>
+                        <p>{{ user_profile.followers.total }} followers</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-content">
+                    <h1>Your Music Analytics</h1>
+                    <div class="time-range-selector">
+                        <button class="time-btn active" data-range="short_term">4 Weeks</button>
+                        <button class="time-btn" data-range="medium_term">3 Months</button>
+                        <button class="time-btn" data-range="long_term">All Time</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content-wrapper">
+                <!-- Overview Section -->
+                <section id="overview" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Top Artist</h3>
+                                <p>{{ top_artists_short.items[0].name if top_artists_short.items else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Top Track</h3>
+                                <p>{{ top_tracks_short.items[0].name if top_tracks_short.items else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Top Genre</h3>
+                                <p>{{ top_genres[0][0] if top_genres else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Mood</h3>
+                                <p>{{ audio_analysis.mood if audio_analysis else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Top Artists (4 Weeks)</h3>
+                            <canvas id="artistsChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h3>Top Tracks (4 Weeks)</h3>
+                            <canvas id="tracksChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Artists Section -->
+                <section id="artists" class="content-section">
+                    <div class="section-header">
+                        <h2>Your Top Artists</h2>
+                        <div class="time-range-buttons">
+                            <button class="time-btn active" data-range="short_term">4 Weeks</button>
+                            <button class="time-btn" data-range="medium_term">3 Months</button>
+                            <button class="time-btn" data-range="long_term">All Time</button>
+                        </div>
+                    </div>
+                    
+                    <div class="artists-grid">
+                        {% for artist in top_artists_short.items %}
+                        <div class="artist-card">
+                            <div class="artist-image">
+                                <img src="{{ artist.images[0].url if artist.images else '/static/default-artist.png' }}" alt="{{ artist.name }}">
+                                <div class="artist-rank">{{ loop.index }}</div>
+                            </div>
+                            <div class="artist-info">
+                                <h3>{{ artist.name }}</h3>
+                                <p>{{ artist.followers.total | format_number }} followers</p>
+                                <div class="artist-genres">
+                                    {% for genre in artist.genres[:3] %}
+                                    <span class="genre-tag">{{ genre }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Tracks Section -->
+                <section id="tracks" class="content-section">
+                    <div class="section-header">
+                        <h2>Your Top Tracks</h2>
+                        <div class="time-range-buttons">
+                            <button class="time-btn active" data-range="short_term">4 Weeks</button>
+                            <button class="time-btn" data-range="medium_term">3 Months</button>
+                            <button class="time-btn" data-range="long_term">All Time</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tracks-list">
+                        {% for track in top_tracks_short.items %}
+                        <div class="track-item">
+                            <div class="track-rank">{{ loop.index }}</div>
+                            <div class="track-image">
+                                <img src="{{ track.album.images[0].url if track.album.images else '/static/default-track.png' }}" alt="{{ track.name }}">
+                            </div>
+                            <div class="track-info">
+                                <h3>{{ track.name }}</h3>
+                                <p>{{ track.artists[0].name }}</p>
+                                <span class="album-name">{{ track.album.name }}</span>
+                            </div>
+                            <div class="track-duration">
+                                {{ (track.duration_ms / 1000 / 60) | round(1) }} min
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Genres Section -->
+                <section id="genres" class="content-section">
+                    <div class="section-header">
+                        <h2>Your Music Genres</h2>
+                    </div>
+                    
+                    <div class="genres-container">
+                        <div class="genres-chart">
+                            <canvas id="genresChart"></canvas>
+                        </div>
+                        
+                        <div class="genres-list">
+                            {% for genre, count in top_genres %}
+                            <div class="genre-item">
+                                <div class="genre-name">{{ genre }}</div>
+                                <div class="genre-bar">
+                                    <div class="genre-bar-fill" style="width: {{ (count / top_genres[0][1]) * 100 }}%"></div>
+                                </div>
+                                <div class="genre-count">{{ count }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Audio Analysis Section -->
+                <section id="audio" class="content-section">
+                    <div class="section-header">
+                        <h2>Audio Analysis</h2>
+                    </div>
+                    
+                    {% if audio_analysis %}
+                    <div class="audio-metrics">
+                        <div class="metric-card">
+                            <h3>Energy</h3>
+                            <div class="metric-value">{{ (audio_analysis.avg_energy * 100) | round(1) }}%</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: {{ audio_analysis.avg_energy * 100 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Danceability</h3>
+                            <div class="metric-value">{{ (audio_analysis.avg_danceability * 100) | round(1) }}%</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: {{ audio_analysis.avg_danceability * 100 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Valence (Happiness)</h3>
+                            <div class="metric-value">{{ (audio_analysis.avg_valence * 100) | round(1) }}%</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: {{ audio_analysis.avg_valence * 100 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Acousticness</h3>
+                            <div class="metric-value">{{ (audio_analysis.avg_acousticness * 100) | round(1) }}%</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: {{ audio_analysis.avg_acousticness * 100 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Instrumentalness</h3>
+                            <div class="metric-value">{{ (audio_analysis.avg_instrumentalness * 100) | round(1) }}%</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: {{ audio_analysis.avg_instrumentalness * 100 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Average Tempo</h3>
+                            <div class="metric-value">{{ audio_analysis.avg_tempo | round(0) }} BPM</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: {{ (audio_analysis.avg_tempo / 200) * 100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="audio-insights">
+                        <div class="insight-card">
+                            <h3>Your Music Mood</h3>
+                            <p class="insight-value">{{ audio_analysis.mood }}</p>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <h3>Dance Style</h3>
+                            <p class="insight-value">{{ audio_analysis.dance_style }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="no-data">
+                        <i class="fas fa-music"></i>
+                        <p>No audio analysis data available</p>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Recent Activity Section -->
+                <section id="recent" class="content-section">
+                    <div class="section-header">
+                        <h2>Recent Activity</h2>
+                    </div>
+                    
+                    {% if recent_activity.items %}
+                    <div class="recent-tracks">
+                        {% for item in recent_activity.items %}
+                        <div class="recent-track">
+                            <div class="track-image">
+                                <img src="{{ item.track.album.images[0].url if item.track.album.images else '/static/default-track.png' }}" alt="{{ item.track.name }}">
+                            </div>
+                            <div class="track-info">
+                                <h3>{{ item.track.name }}</h3>
+                                <p>{{ item.track.artists[0].name }}</p>
+                            </div>
+                            <div class="played-at">
+                                {{ item.played_at.split('T')[0] if item.played_at else 'Recently' }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="no-data">
+                        <i class="fas fa-clock"></i>
+                        <p>No recent activity data available</p>
+                    </div>
+                    {% endif %}
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
