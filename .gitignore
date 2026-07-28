@@ -1,9 +1,9 @@
-_site/
-.jekyll-cache/
-.jekyll-metadata
-.sass-cache/
-node_modules/
-vendor/
-.bundle/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+instance/
 *.log
 .DS_Store
