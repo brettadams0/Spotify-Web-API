@@ -1,0 +1,17 @@
+<li>
+  <a class="tile" href="{{ artist.url or '#' }}" target="_blank" rel="noopener"
+     data-id="{{ artist.id }}" data-rank="{{ artist.rank }}"
+     data-search="{{ artist.name|lower }} {{ artist.genres|join(' ')|lower }}">
+    <div class="tile-art tile-art-round">
+      {% if artist.image %}
+        <img src="{{ artist.image }}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+      {% else %}
+        <span class="art-empty" aria-hidden="true">{% include 'partials/icons/artist.svg' %}</span>
+      {% endif %}
+      <span class="tile-badge">{{ artist.rank }}</span>
+      <span class="tile-delta" data-delta hidden></span>
+    </div>
+    <div class="tile-name">{{ artist.name }}</div>
+    <div class="tile-sub">{{ artist.genres[0] if artist.genres else artist.followers_label ~ ' followers' }}</div>
+  </a>
+</li>

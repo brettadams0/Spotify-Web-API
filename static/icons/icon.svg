@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Spotify Stats">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1ed760"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#08080b"/>
+  <g fill="none" stroke="url(#g)" stroke-linecap="round" stroke-width="34">
+    <path d="M138 196c76-22 154-15 220 21"/>
+    <path d="M157 264c64-17 126-11 179 19"/>
+    <path d="M176 332c50-13 98-8 139 15"/>
+  </g>
+</svg>

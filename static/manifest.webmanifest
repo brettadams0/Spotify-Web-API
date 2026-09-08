@@ -1,0 +1,23 @@
+{
+  "name": "Spotify Stats",
+  "short_name": "Stats",
+  "description": "Your Spotify top artists, tracks and genres across three time ranges, plus recent plays and one-tap playlist export.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08080b",
+  "theme_color": "#08080b",
+  "categories": ["music", "entertainment", "utilities"],
+  "icons": [
+    { "src": "/static/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Top tracks", "url": "/tracks", "description": "Your top tracks chart" },
+    { "name": "Top artists", "url": "/artists", "description": "Your top artists chart" },
+    { "name": "Recently played", "url": "/recent", "description": "Your last 50 plays" }
+  ]
+}

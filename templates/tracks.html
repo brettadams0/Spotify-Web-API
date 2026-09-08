@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% import 'partials/range.html' as ui with context %}
+{% block title %}Top tracks — Spotify Stats{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Top tracks</h1>
+    <p>{{ tracks|length }} tracks · {{ time_ranges[time_range]|lower }}</p>
+  </div>
+  {% if tracks %}
+    <button class="btn btn-primary" id="save-playlist"
+            data-range="{{ time_range }}" data-count="{{ tracks|length }}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      Save as playlist
+    </button>
+  {% endif %}
+</div>
+
+<div class="toolbar">
+  {{ ui.range_picker('pages.tracks', time_range) }}
+  <div class="grow">
+    <label class="visually-hidden" for="filter">Filter tracks</label>
+    <input class="search" id="filter" type="search" placeholder="Filter tracks, artists or albums…"
+           data-filter-target="#track-list" autocomplete="off">
+  </div>
+</div>
+
+<div id="playlist-result" class="flashes" hidden></div>
+
+{% if tracks %}
+  <ol class="rank-list" id="track-list" data-chart="tracks" data-range="{{ time_range }}">
+    {% for track in tracks %}{% include 'partials/track_row.html' %}{% endfor %}
+  </ol>
+  <p class="empty" data-no-results hidden><strong>No tracks match that filter.</strong></p>
+{% else %}
+  {% include 'partials/empty_top.html' %}
+{% endif %}
+{% endblock %}

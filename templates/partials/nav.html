@@ -1,0 +1,18 @@
+{% macro nav_links(mobile=False) %}
+  {% set items = [
+    ('pages.dashboard', 'Home',      'home'),
+    ('pages.artists',   'Artists',   'artist'),
+    ('pages.tracks',    'Tracks',    'track'),
+    ('pages.genres',    'Genres',    'genre'),
+    ('pages.recent',    'Recent',    'clock'),
+    ('pages.playlists', 'Playlists', 'list'),
+  ] %}
+  {% for endpoint, label, icon in items %}
+    <a class="nav-link{% if current_endpoint == endpoint %} is-active{% endif %}"
+       href="{{ url_for(endpoint) }}"
+       {% if current_endpoint == endpoint %}aria-current="page"{% endif %}>
+      {% include 'partials/icons/' ~ icon ~ '.svg' %}
+      <span>{{ label }}</span>
+    </a>
+  {% endfor %}
+{% endmacro %}

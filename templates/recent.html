@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Recently played — Spotify Stats{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Recently played</h1>
+    <p>Your last {{ plays|length }} plays, newest first</p>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="grow">
+    <label class="visually-hidden" for="filter">Filter recent plays</label>
+    <input class="search" id="filter" type="search" placeholder="Filter recent plays…"
+           data-filter-target="#recent-list" autocomplete="off">
+  </div>
+</div>
+
+{% if plays %}
+  <ul class="rank-list" id="recent-list">
+    {% for play in plays %}
+      <li class="rank-row"
+          data-search="{{ play.name|lower }} {{ play.artist_label|lower }} {{ (play.album or '')|lower }}">
+        <span class="rank-num">{{ loop.index }}</span>
+        {% if play.image %}
+          <img class="rank-art" src="{{ play.image }}" alt="" width="48" height="48"
+               loading="lazy" decoding="async" referrerpolicy="no-referrer">
+        {% else %}
+          <span class="rank-art art-empty" aria-hidden="true">
+            {% include 'partials/icons/track.svg' %}
+          </span>
+        {% endif %}
+        <span class="rank-body">
+          <span class="rank-title">
+            {% if play.url %}<a href="{{ play.url }}" target="_blank" rel="noopener">{{ play.name }}</a>
+            {% else %}{{ play.name }}{% endif %}
+          </span>
+          <span class="rank-sub">{{ play.artist_label }}</span>
+        </span>
+        <span class="rank-aside">
+          <time datetime="{{ play.played_at_iso }}" title="{{ play.played_exact }}"
+                data-relative>{{ play.played_label }}</time>
+        </span>
+      </li>
+    {% endfor %}
+  </ul>
+  <p class="empty" data-no-results hidden><strong>No plays match that filter.</strong></p>
+{% else %}
+  <div class="empty">
+    <h2>No recent plays</h2>
+    <p>Spotify keeps roughly the last 50 tracks you played. Listen to something
+       and it will show up here.</p>
+  </div>
+{% endif %}
+{% endblock %}
