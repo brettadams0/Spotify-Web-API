@@ -214,7 +214,10 @@ def aggregate_genres(artists: list[dict[str, Any]], limit: int = 25) -> list[dic
         return []
 
     ordered = sorted(counts, key=lambda g: (-weights[g], -counts[g], g))[:limit]
-    top_count = max(counts[g] for g in ordered)
+    # The bar tracks the same weighted score the ranking uses, so bar length
+    # always decreases down the chart. Scaling it by the raw count instead
+    # would let #2 draw a longer bar than #1.
+    top_weight = max(weights[g] for g in ordered)
 
     return [
         {
@@ -222,7 +225,7 @@ def aggregate_genres(artists: list[dict[str, Any]], limit: int = 25) -> list[dic
             "name": genre,
             "count": counts[genre],
             "share": round(counts[genre] / total * 100),
-            "bar": round(counts[genre] / top_count * 100),
+            "bar": max(4, round(weights[genre] / top_weight * 100)),
             "artists": examples[genre],
         }
         for position, genre in enumerate(ordered, start=1)

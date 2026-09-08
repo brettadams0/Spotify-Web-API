@@ -19,7 +19,7 @@ from spotifystats.shaping import (
     shape_track,
     taste_profile,
 )
-from tests.conftest import make_artist, make_track
+from tests.conftest import make_track
 
 
 class TestPickImage:
@@ -157,14 +157,31 @@ class TestAggregateGenres:
         assert [g["name"] for g in genres] == ["indie rock", "shoegaze"]
         assert genres[0]["count"] == 2
         assert genres[1]["count"] == 3
-        # The bar is scaled against the largest count in the chart.
-        assert genres[1]["bar"] == 100
-        assert genres[0]["bar"] == pytest.approx(67, abs=1)
+        # The bar follows the weighted score, so it never grows going down
+        # the chart even when a lower-ranked genre has a higher count.
+        assert genres[0]["bar"] == 100
+        assert genres[1]["bar"] < 100
+        assert [g["bar"] for g in genres] == sorted(
+            (g["bar"] for g in genres), reverse=True
+        )
 
     def test_records_example_artists_capped_at_three(self):
         artists = [{"name": f"A{i}", "genres": ["pop"]} for i in range(6)]
         genres = aggregate_genres(artists)
         assert genres[0]["artists"] == ["A0", "A1", "A2"]
+
+    def test_bars_never_grow_going_down_the_chart(self):
+        artists = [
+            {"name": "A", "genres": ["alpha"]},
+            {"name": "B", "genres": ["alpha", "beta"]},
+            {"name": "C", "genres": ["beta", "gamma"]},
+            {"name": "D", "genres": ["beta", "gamma"]},
+            {"name": "E", "genres": ["gamma"]},
+        ]
+        bars = [g["bar"] for g in aggregate_genres(artists)]
+        assert bars == sorted(bars, reverse=True)
+        assert bars[0] == 100
+        assert all(bar >= 4 for bar in bars)
 
     def test_respects_the_limit(self):
         artists = [{"name": f"A{i}", "genres": [f"genre{i}"]} for i in range(30)]

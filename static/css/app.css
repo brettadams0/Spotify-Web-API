@@ -42,6 +42,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* The hidden attribute must win over any display rule set below. */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {
@@ -416,9 +419,11 @@ svg {
   font-variant-numeric: tabular-nums; text-align: right;
   font-size: .95rem; font-weight: 700; color: var(--text-mute);
 }
-.rank-row:nth-child(1) .rank-num { color: var(--accent); }
-.rank-row:nth-child(2) .rank-num { color: var(--violet); }
-.rank-row:nth-child(3) .rank-num { color: var(--amber); }
+/* Podium colours belong to ranked charts only. On the recently-played list
+   the number is a position in time, not a rank, so it stays neutral. */
+[data-chart] > .rank-row:nth-child(1) .rank-num { color: var(--accent); }
+[data-chart] > .rank-row:nth-child(2) .rank-num { color: var(--violet); }
+[data-chart] > .rank-row:nth-child(3) .rank-num { color: var(--amber); }
 
 .rank-art {
   width: 44px; height: 44px; border-radius: 7px;
@@ -503,17 +508,30 @@ img.is-broken {
 .tile-art img { width: 100%; height: 100%; object-fit: cover; }
 .tile-art .art-empty { width: 100%; height: 100%; }
 .tile-art-round { border-radius: 50%; }
+/* Positioned against .tile, not .tile-art, so a circular avatar's
+   overflow:hidden cannot clip them. */
 .tile-badge {
-  position: absolute; top: .45rem; left: .45rem;
-  min-width: 1.6rem; height: 1.6rem; padding: 0 .4rem;
+  position: absolute; top: .5rem; left: .5rem; z-index: 1;
+  min-width: 1.65rem; height: 1.65rem; padding: 0 .4rem;
   display: grid; place-items: center; border-radius: 999px;
-  background: rgba(0,0,0,.72); backdrop-filter: blur(6px);
-  font-size: .72rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  background: rgba(6, 6, 9, .82); border: 1px solid var(--border-2);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
+/* Podium colours. Scoped to the grid item: .tile is the only child of its
+   <li>, so a :nth-child on .tile itself would match every tile. */
+.card-grid > li:nth-child(1) .tile-badge { color: var(--accent); }
+.card-grid > li:nth-child(2) .tile-badge { color: var(--violet); }
+.card-grid > li:nth-child(3) .tile-badge { color: var(--amber); }
+
+/* A "no change" dash adds nothing over artwork; keep tiles to real moves. */
+.tile-delta.delta-same { display: none; }
 .tile-delta {
-  position: absolute; top: .45rem; right: .45rem;
-  padding: .1rem .4rem; border-radius: 999px;
-  background: rgba(0,0,0,.72); backdrop-filter: blur(6px);
+  position: absolute; top: .5rem; right: .5rem; z-index: 1;
+  padding: .15rem .45rem; border-radius: 999px;
+  background: rgba(6, 6, 9, .82); border: 1px solid var(--border-2);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
 .tile-name {
   font-size: .88rem; font-weight: 600; line-height: 1.3;

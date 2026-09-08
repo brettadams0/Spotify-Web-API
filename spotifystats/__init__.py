@@ -6,7 +6,7 @@ import os
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 
-from .config import Config, TestConfig
+from .config import Config
 from .spotify import SpotifyAuthRequired, SpotifyUnavailable
 
 __version__ = "2.0.0"

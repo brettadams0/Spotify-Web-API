@@ -9,8 +9,6 @@ from __future__ import annotations
 
 import logging
 import time
-from collections import Counter, defaultdict
-from datetime import datetime, timezone
 from typing import Any, Callable
 
 import spotipy

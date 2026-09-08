@@ -64,20 +64,28 @@
     }
   }
 
+  var DELTA_STATES = ['delta-up', 'delta-down', 'delta-new', 'delta-same'];
+
   function renderDelta(node, previous, current) {
+    // classList, not className: on an artist tile the node also carries
+    // .tile-delta, which is what positions it over the artwork. Overwriting
+    // className would drop it and push the badge into the layout flow.
+    DELTA_STATES.forEach(function (state) { node.classList.remove(state); });
+    node.classList.add('delta');
+
     if (previous === undefined) {
       node.textContent = 'NEW';
-      node.className = 'delta delta-new';
+      node.classList.add('delta-new');
       node.title = 'New to this chart';
     } else if (previous === current) {
       node.textContent = '–';
-      node.className = 'delta delta-same';
+      node.classList.add('delta-same');
       node.title = 'No change since your last visit';
     } else {
       var move = previous - current;
       var up = move > 0;
       node.textContent = (up ? '▲' : '▼') + Math.abs(move);
-      node.className = 'delta ' + (up ? 'delta-up' : 'delta-down');
+      node.classList.add(up ? 'delta-up' : 'delta-down');
       node.title = 'Moved ' + (up ? 'up ' : 'down ') + Math.abs(move) +
         ' since your last visit';
     }
@@ -256,12 +264,17 @@
      placeholder background behind it show through instead of a broken icon.
      ---------------------------------------------------------------------- */
 
+  // A 1x1 transparent GIF. Pointing a failed <img> at this loads successfully,
+  // so the browser stops drawing its broken-image glyph and the placeholder
+  // background painted by .is-broken shows through instead. Removing the src
+  // is not enough — some browsers keep the glyph.
+  var BLANK_PIXEL =
+    'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
   function markBroken(el) {
     if (!el || el.classList.contains('is-broken')) return;
     el.classList.add('is-broken');
-    // Dropping the src stops the browser drawing its broken-image glyph, so
-    // the placeholder background painted by .is-broken shows instead.
-    el.removeAttribute('src');
+    el.src = BLANK_PIXEL;
   }
 
   function initBrokenArt() {
