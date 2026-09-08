@@ -19,3 +19,6 @@ instance/
 # Misc
 *.log
 .DS_Store
+
+# Runtime
+*.pid
