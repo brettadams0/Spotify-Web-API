@@ -1,9 +1,24 @@
+# Python
 __pycache__/
 *.py[cod]
+*.egg-info/
 .venv/
 venv/
 env/
+.pytest_cache/
+
+# Secrets — never commit these
 .env
+.env.*
+!.env.example
+.cache
+
+# Flask
 instance/
+
+# Misc
 *.log
 .DS_Store
+
+# Runtime
+*.pid

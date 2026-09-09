@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% import 'partials/range.html' as ui with context %}
+{% block title %}Top artists — Spotify Stats{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Top artists</h1>
+    <p>{{ artists|length }} artists · {{ time_ranges[time_range]|lower }}</p>
+  </div>
+</div>
+
+<div class="toolbar">
+  {{ ui.range_picker('pages.artists', time_range) }}
+  <div class="grow">
+    <label class="visually-hidden" for="filter">Filter artists</label>
+    <input class="search" id="filter" type="search" placeholder="Filter artists or genres…"
+           data-filter-target="#artist-grid" autocomplete="off">
+  </div>
+</div>
+
+{% if artists %}
+  <ul class="card-grid" id="artist-grid" data-chart="artists" data-range="{{ time_range }}">
+    {% for artist in artists %}{% include 'partials/artist_tile.html' %}{% endfor %}
+  </ul>
+  <p class="empty" data-no-results hidden><strong>No artists match that filter.</strong></p>
+{% else %}
+  {% include 'partials/empty_top.html' %}
+{% endif %}
+{% endblock %}

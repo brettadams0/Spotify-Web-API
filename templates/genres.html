@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% import 'partials/range.html' as ui with context %}
+{% block title %}Top genres — Spotify Stats{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Top genres</h1>
+    <p>Ranked across your top artists · {{ time_ranges[time_range]|lower }}</p>
+  </div>
+</div>
+
+<div class="toolbar">
+  {{ ui.range_picker('pages.genres', time_range) }}
+  <div class="grow">
+    <label class="visually-hidden" for="filter">Filter genres</label>
+    <input class="search" id="filter" type="search" placeholder="Filter genres…"
+           data-filter-target="#genre-list" autocomplete="off">
+  </div>
+</div>
+
+{% if genres %}
+  <ul class="genre-list" id="genre-list">
+    {% for genre in genres %}{% include 'partials/genre_row.html' %}{% endfor %}
+  </ul>
+  <p class="empty" data-no-results hidden><strong>No genres match that filter.</strong></p>
+{% else %}
+  <div class="empty">
+    <h2>No genres yet</h2>
+    <p>Genres come from your top artists. Once Spotify has enough listening
+       history to build an artist chart, this page fills in.</p>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}{{ code }} — Spotify Stats{% endblock %}
+
+{# Rendered through whichever slot base.html exposes for this visitor. #}
+{% block public_content %}{% include 'partials/error_body.html' %}{% endblock %}
+{% block content %}{% include 'partials/error_body.html' %}{% endblock %}

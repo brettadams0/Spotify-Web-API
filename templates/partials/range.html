@@ -1,0 +1,9 @@
+{% macro range_picker(endpoint, current) %}
+  <div class="segmented" role="tablist" aria-label="Time range">
+    {% for value, label in time_ranges.items() %}
+      <a role="tab" href="{{ url_for(endpoint, range=value) }}"
+         class="{% if current == value %}is-active{% endif %}"
+         aria-selected="{{ 'true' if current == value else 'false' }}">{{ label }}</a>
+    {% endfor %}
+  </div>
+{% endmacro %}

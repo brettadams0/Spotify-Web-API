@@ -1,0 +1,23 @@
+<li class="rank-row" data-id="{{ track.id }}" data-rank="{{ track.rank }}"
+    data-search="{{ track.name|lower }} {{ track.artist_label|lower }} {{ (track.album or '')|lower }}">
+  <span class="rank-num">{{ track.rank }}</span>
+  {% if track.image %}
+    <img class="rank-art" src="{{ track.image }}" alt="" width="48" height="48"
+         loading="lazy" decoding="async" referrerpolicy="no-referrer">
+  {% else %}
+    <span class="rank-art art-empty" aria-hidden="true">
+      {% include 'partials/icons/track.svg' %}
+    </span>
+  {% endif %}
+  <span class="rank-body">
+    <span class="rank-title">
+      {% if track.url %}<a href="{{ track.url }}" target="_blank" rel="noopener">{{ track.name }}</a>
+      {% else %}{{ track.name }}{% endif %}
+    </span>
+    <span class="rank-sub">{{ track.artist_label }}{% if track.album %} · {{ track.album }}{% endif %}</span>
+  </span>
+  <span class="rank-aside">
+    <span class="delta" data-delta hidden></span>
+    <span class="rank-time">{{ track.duration }}</span>
+  </span>
+</li>

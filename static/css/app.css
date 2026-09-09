@@ -1,0 +1,678 @@
+/* ==========================================================================
+   Spotify Stats — design system
+   Dark-only by design; layout scales from a 320px phone to a wide monitor.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  --bg:        #08080b;
+  --bg-1:      #101015;
+  --bg-2:      #17171e;
+  --bg-3:      #21212a;
+  --border:    rgba(255, 255, 255, .09);
+  --border-2:  rgba(255, 255, 255, .16);
+
+  --text:      #f4f4f6;
+  --text-dim:  #a3a3ae;
+  --text-mute: #6f6f7c;
+
+  --accent:      #1ed760;
+  --accent-soft: rgba(30, 215, 96, .14);
+  --accent-ink:  #04240f;
+  --violet:      #a78bfa;
+  --rose:        #fb7185;
+  --amber:       #fbbf24;
+
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 20px;
+
+  --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28);
+
+  --sidebar-w: 244px;
+  --tabbar-h:  calc(58px + env(safe-area-inset-bottom));
+  --gutter:    clamp(1rem, 4vw, 2.5rem);
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+          Arial, "Noto Sans", sans-serif;
+
+  --ease: cubic-bezier(.2, .7, .3, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* The hidden attribute must win over any display rule set below. */
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 12% -10%, rgba(30,215,96,.10), transparent 60%),
+    radial-gradient(900px 520px at 92% 0%, rgba(167,139,250,.10), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+
+svg {
+  width: 1.25em; height: 1.25em;
+  fill: none; stroke: currentColor;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.logo { stroke: none; }
+.logo path { stroke: currentColor; }
+
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  padding: .75rem 1rem; background: var(--accent); color: var(--accent-ink);
+  font-weight: 700; border-radius: 0 0 var(--radius-sm) 0;
+}
+.skip-link:focus { left: 0; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Shell: sidebar on wide screens, tab bar on phones
+   -------------------------------------------------------------------------- */
+
+.shell { display: block; }
+
+.sidebar { display: none; }
+
+.main-col { min-width: 0; }
+
+.main {
+  padding: clamp(1rem, 3vw, 2rem) var(--gutter)
+           calc(var(--tabbar-h) + 2rem);
+  max-width: 1440px;
+  margin-inline: auto;
+}
+.main-plain { padding-bottom: 2rem; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+  padding: .65rem var(--gutter);
+  padding-top: calc(.65rem + env(safe-area-inset-top));
+  background: rgba(8, 8, 11, .82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-actions { display: flex; align-items: center; gap: .4rem; }
+.topbar-signout { display: contents; }
+
+.brand {
+  display: inline-flex; align-items: center; gap: .55rem;
+  font-size: 1.05rem; letter-spacing: -.01em; color: var(--text);
+}
+.brand .logo { width: 1.6em; height: 1.6em; color: var(--accent); }
+.brand strong { color: var(--accent); font-weight: 700; }
+.brand span { font-weight: 500; }
+
+.tabbar {
+  position: fixed; inset: auto 0 0 0; z-index: 40;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  height: var(--tabbar-h);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(12, 12, 16, .94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid var(--border);
+}
+.tabbar .nav-link {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px;
+  min-width: 0; padding: .25rem 2px;
+  color: var(--text-mute); font-size: .625rem; font-weight: 600;
+  letter-spacing: .01em;
+  transition: color .18s var(--ease);
+}
+.tabbar .nav-link svg { width: 21px; height: 21px; }
+.tabbar .nav-link span {
+  max-width: 100%; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.tabbar .nav-link.is-active { color: var(--accent); }
+
+.footer {
+  padding: 2rem var(--gutter) calc(var(--tabbar-h) + 1rem);
+  color: var(--text-mute); font-size: .78rem; text-align: center;
+  max-width: 60ch; margin-inline: auto;
+}
+
+@media (min-width: 900px) {
+  .shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  }
+  .sidebar {
+    display: flex; flex-direction: column; gap: 1.25rem;
+    position: sticky; top: 0; height: 100dvh;
+    padding: 1.5rem 1rem;
+    background: rgba(13, 13, 17, .72);
+    backdrop-filter: blur(14px);
+    border-right: 1px solid var(--border);
+  }
+  .sidebar .brand { padding: 0 .6rem .25rem; font-size: 1.15rem; }
+  .sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-nav .nav-link {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .62rem .7rem; border-radius: 10px;
+    color: var(--text-dim); font-size: .92rem; font-weight: 600;
+    transition: background .18s var(--ease), color .18s var(--ease);
+  }
+  .sidebar-nav .nav-link:hover { background: var(--bg-2); color: var(--text); }
+  .sidebar-nav .nav-link.is-active {
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .sidebar-foot { margin-top: auto; display: grid; gap: .75rem; }
+
+  .tabbar { display: none; }
+  .brand-mobile { display: none; }
+  .topbar { justify-content: flex-end; }
+  .main { padding-bottom: 1rem; }
+  .footer { padding-bottom: 2rem; }
+  :root { --tabbar-h: 0px; }
+}
+
+/* --------------------------------------------------------------------------
+   Now playing (sidebar widget)
+   -------------------------------------------------------------------------- */
+
+.now-playing {
+  padding: .7rem; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--bg-2);
+}
+.np-label {
+  display: flex; align-items: center; gap: .45rem;
+  font-size: .68rem; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: .55rem;
+}
+.np-bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+.np-bars i {
+  width: 2.5px; background: var(--accent); border-radius: 2px;
+  animation: eq .9s ease-in-out infinite;
+}
+.np-bars i:nth-child(1) { height: 40%; animation-delay: -.2s; }
+.np-bars i:nth-child(2) { height: 100%; animation-delay: -.5s; }
+.np-bars i:nth-child(3) { height: 65%; animation-delay: -.8s; }
+@keyframes eq { 0%,100% { transform: scaleY(.4); } 50% { transform: scaleY(1); } }
+
+.np-track { display: flex; align-items: center; gap: .6rem; min-width: 0; }
+.np-art { border-radius: 6px; object-fit: cover; flex: none; background: var(--bg-3); }
+.np-meta { min-width: 0; display: grid; }
+.np-title, .np-artist {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.np-title { font-size: .84rem; font-weight: 600; }
+.np-artist { font-size: .75rem; color: var(--text-dim); }
+
+/* --------------------------------------------------------------------------
+   Buttons, chips, segmented control
+   -------------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: .5rem; padding: .6rem 1.05rem;
+  border: 1px solid transparent; border-radius: 999px;
+  background: var(--bg-3); color: var(--text);
+  font-size: .88rem; font-weight: 600; cursor: pointer;
+  transition: background .18s var(--ease), transform .18s var(--ease),
+              border-color .18s var(--ease), opacity .18s var(--ease);
+}
+.btn:hover { background: var(--border-2); }
+.btn:active { transform: scale(.97); }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+.btn svg { width: 1.05em; height: 1.05em; }
+
+.btn-primary {
+  background: var(--accent); color: var(--accent-ink); font-weight: 700;
+}
+.btn-primary:hover { background: #24ec6c; }
+
+.btn-ghost { background: transparent; border-color: var(--border); }
+.btn-ghost:hover { background: var(--bg-2); border-color: var(--border-2); }
+
+.btn-block { width: 100%; }
+.btn-icon { padding: .5rem; border-radius: 10px; }
+.btn-icon svg { width: 1.2em; height: 1.2em; }
+
+.btn-lg { padding: .85rem 1.6rem; font-size: 1rem; }
+
+.segmented {
+  display: inline-flex; padding: 3px; gap: 2px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 999px; max-width: 100%; overflow-x: auto;
+  scrollbar-width: none;
+}
+.segmented::-webkit-scrollbar { display: none; }
+.segmented a {
+  padding: .48rem .95rem; border-radius: 999px;
+  font-size: .82rem; font-weight: 600; color: var(--text-dim);
+  white-space: nowrap;
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.segmented a:hover { color: var(--text); }
+.segmented a.is-active { background: var(--accent); color: var(--accent-ink); }
+
+/* On the narrowest phones, tighten the control so all three ranges fit
+   rather than leaving the last one half off-screen. */
+@media (max-width: 400px) {
+  .segmented { display: flex; width: 100%; }
+  .segmented a { flex: 1 1 0; padding: .48rem .3rem; font-size: .75rem; text-align: center; }
+}
+
+.chip {
+  display: inline-block; padding: .2rem .6rem;
+  border-radius: 999px; background: var(--bg-3);
+  font-size: .7rem; font-weight: 600; color: var(--text-dim);
+}
+
+/* --------------------------------------------------------------------------
+   Page header + section headers
+   -------------------------------------------------------------------------- */
+
+.page-head {
+  display: flex; flex-wrap: wrap; align-items: flex-end;
+  justify-content: space-between; gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.page-head h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.6rem);
+  letter-spacing: -.02em; line-height: 1.1;
+}
+.page-head p { margin: .35rem 0 0; color: var(--text-dim); font-size: .92rem; }
+
+.toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+.toolbar .grow { flex: 1 1 12rem; min-width: 0; }
+
+.search {
+  width: 100%; padding: .62rem .95rem;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 999px; color: var(--text); font-size: .9rem;
+}
+.search::placeholder { color: var(--text-mute); }
+.search:focus { border-color: var(--border-2); outline-offset: 0; }
+
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 1rem; margin: 2rem 0 .9rem;
+}
+.section-head:first-child { margin-top: 0; }
+.section-head h2 {
+  margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em;
+}
+.section-head a { font-size: .82rem; font-weight: 600; color: var(--accent); }
+
+/* --------------------------------------------------------------------------
+   Cards & stat grid
+   -------------------------------------------------------------------------- */
+
+.card {
+  padding: 1.15rem; border: 1px solid var(--border);
+  border-radius: var(--radius-lg); background: var(--bg-1);
+  box-shadow: var(--shadow);
+}
+
+.stat-grid {
+  display: grid; gap: .7rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-bottom: 1.5rem;
+}
+.stat {
+  padding: .95rem 1rem; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--bg-1);
+}
+.stat dt {
+  font-size: .7rem; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text-mute);
+}
+.stat dd {
+  margin: .3rem 0 0;
+  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+  font-weight: 700; letter-spacing: -.02em; line-height: 1.1;
+}
+.stat .stat-note {
+  display: block; margin-top: .15rem;
+  font-size: .74rem; line-height: 1.35;
+  color: var(--text-dim); font-weight: 500; letter-spacing: 0;
+}
+/* A unit that reads as part of the number, so it stays on the same line. */
+.stat .stat-unit {
+  font-size: .8rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0;
+}
+
+/* Profile hero */
+.hero {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem;
+  padding: clamp(1.15rem, 3vw, 1.9rem);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, rgba(30,215,96,.13), rgba(167,139,250,.10) 55%, transparent),
+    var(--bg-1);
+  margin-bottom: 1.5rem;
+}
+.hero-avatar {
+  width: clamp(64px, 16vw, 96px); height: clamp(64px, 16vw, 96px);
+  border-radius: 50%; object-fit: cover; flex: none;
+  background: var(--bg-3); border: 2px solid var(--border-2);
+}
+.hero-avatar-fallback {
+  display: grid; place-items: center;
+  font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: 700; color: var(--accent);
+}
+.hero-body { min-width: 0; flex: 1 1 14rem; }
+.hero h1 {
+  margin: 0; font-size: clamp(1.5rem, 1.1rem + 2vw, 2.4rem);
+  letter-spacing: -.025em; line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem;
+}
+
+/* --------------------------------------------------------------------------
+   Ranked lists (tracks, recent plays)
+   -------------------------------------------------------------------------- */
+
+.rank-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+
+.rank-row {
+  display: grid;
+  grid-template-columns: 2.1rem 44px minmax(0, 1fr) auto;
+  align-items: center; gap: .75rem;
+  padding: .5rem .65rem; border-radius: 12px;
+  background: var(--bg-1); border: 1px solid transparent;
+  transition: background .16s var(--ease), border-color .16s var(--ease);
+}
+.rank-row:hover { background: var(--bg-2); border-color: var(--border); }
+.rank-row.is-hidden { display: none; }
+
+.rank-num {
+  font-variant-numeric: tabular-nums; text-align: right;
+  font-size: .95rem; font-weight: 700; color: var(--text-mute);
+}
+/* Podium colours belong to ranked charts only. On the recently-played list
+   the number is a position in time, not a rank, so it stays neutral. */
+[data-chart] > .rank-row:nth-child(1) .rank-num { color: var(--accent); }
+[data-chart] > .rank-row:nth-child(2) .rank-num { color: var(--violet); }
+[data-chart] > .rank-row:nth-child(3) .rank-num { color: var(--amber); }
+
+.rank-art {
+  width: 44px; height: 44px; border-radius: 7px;
+  object-fit: cover; background: var(--bg-3); flex: none;
+}
+.rank-art-round { border-radius: 50%; }
+
+/* Shown when Spotify has no artwork, or the image fails to load. */
+.art-empty {
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--bg-3), var(--bg-2));
+  color: var(--text-mute);
+}
+.art-empty svg { width: 45%; height: 45%; }
+img.is-broken {
+  background: linear-gradient(135deg, var(--bg-3), var(--bg-2));
+}
+
+.rank-body { min-width: 0; }
+/* display:block matters here: overflow/ellipsis is ignored on an inline box,
+   which would let a long title push the row wider than the viewport. */
+.rank-title {
+  display: block; font-size: .93rem; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rank-sub {
+  display: block; font-size: .79rem; color: var(--text-dim);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rank-aside {
+  display: flex; align-items: center; gap: .6rem;
+  font-size: .78rem; color: var(--text-mute);
+  font-variant-numeric: tabular-nums;
+}
+.rank-time { display: none; }
+
+.delta {
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: .72rem; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.delta-up   { color: var(--accent); }
+.delta-down { color: var(--rose); }
+.delta-new  { color: var(--violet); }
+.delta-same { color: var(--text-mute); }
+
+@media (min-width: 560px) {
+  .rank-time { display: inline; }
+  .rank-row { grid-template-columns: 2.4rem 48px minmax(0, 1fr) auto; }
+  .rank-art { width: 48px; height: 48px; }
+}
+
+/* --------------------------------------------------------------------------
+   Artist / playlist card grid
+   -------------------------------------------------------------------------- */
+
+.card-grid {
+  display: grid; gap: clamp(.7rem, 2vw, 1.1rem);
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  list-style: none; margin: 0; padding: 0;
+}
+@media (min-width: 640px) {
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); }
+}
+
+.tile {
+  position: relative; display: block; padding: .75rem;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-1); height: 100%;
+  transition: background .18s var(--ease), transform .18s var(--ease),
+              border-color .18s var(--ease);
+}
+.tile:hover {
+  background: var(--bg-2); border-color: var(--border-2);
+  transform: translateY(-3px);
+}
+.tile.is-hidden { display: none; }
+
+.tile-art {
+  position: relative; aspect-ratio: 1; margin-bottom: .7rem;
+  border-radius: 10px; overflow: hidden; background: var(--bg-3);
+}
+.tile-art img { width: 100%; height: 100%; object-fit: cover; }
+.tile-art .art-empty { width: 100%; height: 100%; }
+.tile-art-round { border-radius: 50%; }
+/* Positioned against .tile, not .tile-art, so a circular avatar's
+   overflow:hidden cannot clip them. */
+.tile-badge {
+  position: absolute; top: .5rem; left: .5rem; z-index: 1;
+  min-width: 1.65rem; height: 1.65rem; padding: 0 .4rem;
+  display: grid; place-items: center; border-radius: 999px;
+  background: rgba(6, 6, 9, .82); border: 1px solid var(--border-2);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+/* Podium colours. Scoped to the grid item: .tile is the only child of its
+   <li>, so a :nth-child on .tile itself would match every tile. */
+.card-grid > li:nth-child(1) .tile-badge { color: var(--accent); }
+.card-grid > li:nth-child(2) .tile-badge { color: var(--violet); }
+.card-grid > li:nth-child(3) .tile-badge { color: var(--amber); }
+
+/* A "no change" dash adds nothing over artwork; keep tiles to real moves. */
+.tile-delta.delta-same { display: none; }
+.tile-delta {
+  position: absolute; top: .5rem; right: .5rem; z-index: 1;
+  padding: .15rem .45rem; border-radius: 999px;
+  background: rgba(6, 6, 9, .82); border: 1px solid var(--border-2);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.tile-name {
+  font-size: .88rem; font-weight: 600; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.tile-sub {
+  margin-top: .2rem; font-size: .75rem; color: var(--text-dim);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Genre bars
+   -------------------------------------------------------------------------- */
+
+.genre-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.genre-row {
+  position: relative; overflow: hidden;
+  padding: .7rem .9rem; border-radius: 12px;
+  background: var(--bg-1); border: 1px solid var(--border);
+}
+.genre-row.is-hidden { display: none; }
+.genre-fill {
+  position: absolute; inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--accent-soft), rgba(167,139,250,.12));
+  border-right: 1px solid rgba(30,215,96,.35);
+  animation: grow .5s var(--ease) both;
+}
+@keyframes grow { from { transform: scaleX(0); transform-origin: left; } }
+.genre-content {
+  position: relative; display: flex; align-items: center;
+  gap: .75rem; justify-content: space-between;
+}
+.genre-name {
+  display: flex; align-items: baseline; gap: .6rem; min-width: 0;
+}
+.genre-name b {
+  font-size: .93rem; font-weight: 700;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.genre-rank {
+  font-size: .8rem; font-weight: 700; color: var(--text-mute);
+  font-variant-numeric: tabular-nums; flex: none; width: 1.7rem;
+}
+.genre-artists {
+  display: block; font-size: .74rem; color: var(--text-dim);
+  margin-top: .25rem; position: relative;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.genre-count {
+  flex: none; font-size: .8rem; font-weight: 700; color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Landing page
+   -------------------------------------------------------------------------- */
+
+.landing {
+  min-height: 100dvh; display: grid; place-items: center;
+  padding: clamp(1.5rem, 6vw, 4rem) var(--gutter);
+  text-align: center;
+}
+.landing-inner { max-width: 62ch; }
+.landing .brand { justify-content: center; margin-bottom: 2rem; font-size: 1.15rem; }
+.landing h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 1.2rem + 5vw, 4rem);
+  line-height: 1.05; letter-spacing: -.035em;
+}
+.landing h1 em {
+  font-style: normal;
+  background: linear-gradient(100deg, var(--accent), var(--violet));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.landing .lede {
+  margin: 0 auto 2rem; max-width: 46ch;
+  font-size: clamp(1rem, .95rem + .4vw, 1.15rem); color: var(--text-dim);
+}
+.landing-cta { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; }
+.landing-note { margin-top: 1.25rem; font-size: .8rem; color: var(--text-mute); }
+
+.feature-grid {
+  display: grid; gap: .75rem; margin-top: 3rem; text-align: left;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.feature {
+  padding: 1rem; border: 1px solid var(--border);
+  border-radius: var(--radius); background: rgba(16,16,21,.6);
+}
+.feature svg { color: var(--accent); width: 1.4em; height: 1.4em; }
+.feature h2 { margin: .6rem 0 .3rem; font-size: .95rem; }
+.feature p { margin: 0; font-size: .82rem; color: var(--text-dim); line-height: 1.5; }
+
+/* --------------------------------------------------------------------------
+   Flashes, empty states, errors
+   -------------------------------------------------------------------------- */
+
+.flashes { display: grid; gap: .5rem; margin-bottom: 1.25rem; }
+.flash {
+  margin: 0; padding: .7rem 1rem; border-radius: var(--radius-sm);
+  font-size: .87rem; border: 1px solid var(--border);
+  background: var(--bg-2);
+}
+.flash-error   { border-color: rgba(251,113,133,.4); background: rgba(251,113,133,.11); }
+.flash-success { border-color: rgba(30,215,96,.35);  background: var(--accent-soft); }
+
+.empty {
+  padding: clamp(2rem, 8vw, 4rem) 1.5rem; text-align: center;
+  border: 1px dashed var(--border-2); border-radius: var(--radius-lg);
+  color: var(--text-dim);
+}
+.empty h2 { margin: 0 0 .5rem; font-size: 1.1rem; color: var(--text); }
+.empty p { margin: 0 auto; max-width: 42ch; font-size: .9rem; }
+
+.error-page {
+  min-height: 100dvh; display: grid; place-items: center;
+  padding: 2rem var(--gutter); text-align: center;
+}
+.error-page h1 {
+  margin: 0 0 .5rem; font-size: clamp(2rem, 1.2rem + 4vw, 3.4rem);
+  letter-spacing: -.03em;
+}
+.error-page p { color: var(--text-dim); max-width: 46ch; margin: 0 auto 1.75rem; }
+
+/* --------------------------------------------------------------------------
+   Motion & print
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tile:hover { transform: none; }
+}
+
+@media print {
+  .sidebar, .tabbar, .topbar, .toolbar, .footer { display: none !important; }
+  body { background: #fff; color: #000; }
+  .rank-row, .tile, .genre-row { break-inside: avoid; }
+}

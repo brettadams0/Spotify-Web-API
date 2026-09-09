@@ -1,0 +1,13 @@
+<li class="genre-row" data-search="{{ genre.name|lower }}">
+  <span class="genre-fill" style="width: {{ genre.bar }}%"></span>
+  <span class="genre-content">
+    <span class="genre-name">
+      <span class="genre-rank">{{ genre.rank }}</span>
+      <b>{{ genre.name }}</b>
+    </span>
+    <span class="genre-count">{{ genre.count }} {{ 'artist' if genre.count == 1 else 'artists' }}</span>
+  </span>
+  {% if genre.artists %}
+    <span class="genre-artists">{{ genre.artists|join(' · ') }}</span>
+  {% endif %}
+</li>
