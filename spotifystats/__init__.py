@@ -6,6 +6,7 @@ import os
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 
+from . import performance
 from .config import Config
 from .spotify import SpotifyAuthRequired, SpotifyUnavailable
 
@@ -40,6 +41,7 @@ def create_app(config_object: type[Config] | None = None) -> Flask:
     app.register_blueprint(auth.bp)
     app.register_blueprint(api.bp)
 
+    performance.register(app)
     _register_error_handlers(app)
     _register_security_headers(app)
     _register_template_filters(app)

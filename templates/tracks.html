@@ -6,7 +6,7 @@
 <div class="page-head">
   <div>
     <h1>Top tracks</h1>
-    <p>{{ tracks|length }} tracks · {{ time_ranges[time_range]|lower }}</p>
+    <p>{{ tracks|length }} tracks · {{ explicit_share }}% explicit · {{ time_ranges[time_range]|lower }}</p>
   </div>
   {% if tracks %}
     <button class="btn btn-primary" id="save-playlist"
@@ -32,7 +32,7 @@
   <ol class="rank-list" id="track-list" data-chart="tracks" data-range="{{ time_range }}">
     {% for track in tracks %}{% include 'partials/track_row.html' %}{% endfor %}
   </ol>
-  <p class="empty" data-no-results hidden><strong>No tracks match that filter.</strong></p>
+  <p class="empty" data-no-results hidden>No tracks match that filter.</p>
 {% else %}
   {% include 'partials/empty_top.html' %}
 {% endif %}

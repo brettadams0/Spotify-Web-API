@@ -3,19 +3,21 @@
 {% block title %}{{ profile.name }} — Spotify Stats{% endblock %}
 
 {% block content %}
-<section class="hero">
+<section class="identity">
   {% if profile.image %}
-    <img class="hero-avatar" src="{{ profile.image }}" alt="" width="96" height="96" referrerpolicy="no-referrer">
+    <img class="identity-avatar" src="{{ profile.image }}"
+         {% if profile.srcset %}srcset="{{ profile.srcset }}" sizes="56px"{% endif %}
+         alt="" width="56" height="56" fetchpriority="high" referrerpolicy="no-referrer">
   {% else %}
-    <div class="hero-avatar hero-avatar-fallback" aria-hidden="true">{{ profile.name[:1]|upper }}</div>
+    <div class="identity-avatar identity-avatar-fallback" aria-hidden="true">{{ profile.name[:1]|upper }}</div>
   {% endif %}
-  <div class="hero-body">
+  <div class="identity-body">
     <h1>{{ profile.name }}</h1>
-    <div class="hero-meta">
+    <div class="identity-meta">
       {% if profile.followers %}<span class="chip">{{ profile.followers|number }} followers</span>{% endif %}
       {% if profile.country %}<span class="chip">{{ profile.country }}</span>{% endif %}
       {% if profile.product %}<span class="chip">{{ profile.product|capitalize }}</span>{% endif %}
-      {% if profile.url %}<a class="chip" href="{{ profile.url }}" target="_blank" rel="noopener">Open in Spotify ↗</a>{% endif %}
+      {% if profile.url %}<a class="chip" href="{{ profile.url }}" target="_blank" rel="noopener">Spotify ↗</a>{% endif %}
     </div>
   </div>
 </section>
@@ -25,68 +27,86 @@
 </div>
 
 {% if stats.track_count %}
-<dl class="stat-grid">
+<dl class="stat-strip">
   <div class="stat">
-    <dt>Distinct genres</dt>
-    <dd>{{ stats.genre_count }}
-      <span class="stat-note">across your top {{ stats.artist_count }} artists</span>
-    </dd>
+    <dt>Genres</dt>
+    <dd>{{ stats.genre_count }}</dd>
+    <span class="stat-note">across {{ stats.artist_count }} artists</span>
   </div>
   <div class="stat">
     <dt>Obscurity</dt>
-    <dd>{{ stats.obscurity if stats.obscurity is not none else '—' }}<span class="stat-unit">/ 100</span>
-      <span class="stat-note">higher means less mainstream</span>
-    </dd>
+    <dd>{{ stats.obscurity if stats.obscurity is not none else '—' }}<span class="stat-unit"> / 100</span></dd>
+    <span class="stat-note">higher is less mainstream</span>
   </div>
   <div class="stat">
-    <dt>Average release</dt>
-    <dd>{{ stats.avg_year or '—' }}
-      <span class="stat-note">mostly the {{ stats.top_decade or '—' }}</span>
-    </dd>
+    <dt>Median era</dt>
+    <dd>{{ stats.top_decade or '—' }}</dd>
+    <span class="stat-note">avg. release {{ stats.avg_year or '—' }}</span>
   </div>
   <div class="stat">
-    <dt>Average length</dt>
-    <dd>{{ stats.avg_duration }}
-      <span class="stat-note">{{ stats.total_duration }} total</span>
-    </dd>
-  </div>
-  <div class="stat">
-    <dt>Explicit</dt>
-    <dd>{{ stats.explicit_share }}<span class="stat-unit">%</span>
-      <span class="stat-note">of your top tracks</span>
-    </dd>
+    <dt>Track length</dt>
+    <dd>{{ stats.avg_duration }}</dd>
+    <span class="stat-note">{{ stats.total_duration }} total</span>
   </div>
 </dl>
 {% endif %}
 
-<div class="section-head">
-  <h2>Top artists</h2>
-  <a href="{{ url_for('pages.artists', range=time_range) }}">See all {{ time_ranges[time_range]|lower }} →</a>
-</div>
-{% if artists %}
-  <ul class="card-grid" data-chart="artists" data-range="{{ time_range }}">
-    {% for artist in artists %}{% include 'partials/artist_tile.html' %}{% endfor %}
-  </ul>
-{% else %}
-  {% include 'partials/empty_top.html' %}
-{% endif %}
+<div class="split">
+  <section class="split-col">
+    <div class="section-head">
+      <h2>Top artists</h2>
+      <a href="{{ url_for('pages.artists', range=time_range) }}">All {{ artist_total }} →</a>
+    </div>
+    {% if artists %}
+      <ul class="rank-list" data-chart="artists" data-range="{{ time_range }}">
+        {% for artist in artists %}
+          <li class="rank-row" data-id="{{ artist.id }}" data-rank="{{ artist.rank }}">
+            <span class="rank-num">{{ artist.rank }}</span>
+            {% if artist.image %}
+              <img class="rank-art rank-art-round" src="{{ artist.image }}"
+                   {% if artist.srcset %}srcset="{{ artist.srcset }}" sizes="36px"{% endif %}
+                   alt="" width="36" height="36" loading="lazy" decoding="async"
+                   referrerpolicy="no-referrer">
+            {% else %}
+              <span class="rank-art rank-art-round art-empty" aria-hidden="true">
+                {% include 'partials/icons/artist.svg' %}
+              </span>
+            {% endif %}
+            <span class="rank-body">
+              <span class="rank-title">
+                {% if artist.url %}<a href="{{ artist.url }}" target="_blank" rel="noopener">{{ artist.name }}</a>
+                {% else %}{{ artist.name }}{% endif %}
+              </span>
+              <span class="rank-sub">{{ artist.genres[0] if artist.genres else artist.followers_label ~ ' followers' }}</span>
+            </span>
+            <span class="rank-aside"><span class="delta" data-delta hidden></span></span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% include 'partials/empty_top.html' %}
+    {% endif %}
+  </section>
 
-<div class="section-head">
-  <h2>Top tracks</h2>
-  <a href="{{ url_for('pages.tracks', range=time_range) }}">See all {{ time_ranges[time_range]|lower }} →</a>
+  <section class="split-col">
+    <div class="section-head">
+      <h2>Top tracks</h2>
+      <a href="{{ url_for('pages.tracks', range=time_range) }}">All {{ track_total }} →</a>
+    </div>
+    {% if tracks %}
+      <ol class="rank-list" data-chart="tracks" data-range="{{ time_range }}">
+        {% for track in tracks %}{% include 'partials/track_row.html' %}{% endfor %}
+      </ol>
+    {% else %}
+      {% include 'partials/empty_top.html' %}
+    {% endif %}
+  </section>
 </div>
-{% if tracks %}
-  <ol class="rank-list" data-chart="tracks" data-range="{{ time_range }}">
-    {% for track in tracks %}{% include 'partials/track_row.html' %}{% endfor %}
-  </ol>
-{% else %}
-  {% include 'partials/empty_top.html' %}
-{% endif %}
 
 {% if genres %}
 <div class="section-head">
   <h2>Top genres</h2>
-  <a href="{{ url_for('pages.genres', range=time_range) }}">See all →</a>
+  <a href="{{ url_for('pages.genres', range=time_range) }}">All →</a>
 </div>
 <ul class="genre-list">
   {% for genre in genres %}{% include 'partials/genre_row.html' %}{% endfor %}

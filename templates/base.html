@@ -8,10 +8,12 @@
   <meta name="theme-color" content="#0a0a0c">
   <meta name="description" content="See your Spotify top artists, tracks and genres across three time ranges, browse your recent plays, and save any chart as a playlist.">
   <title>{% block title %}Spotify Stats{% endblock %}</title>
+  <link rel="preconnect" href="https://i.scdn.co" crossorigin>
+  <link rel="dns-prefetch" href="https://i.scdn.co">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
   <link rel="icon" href="{{ url_for('static', filename='icons/icon.svg') }}" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -82,7 +84,7 @@
   </main>
   {% endif %}
 
-  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  <script src="{{ asset('js/app.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

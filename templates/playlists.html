@@ -5,7 +5,7 @@
 <div class="page-head">
   <div>
     <h1>Playlists</h1>
-    <p>{{ playlists|length }} playlists on your account</p>
+    <p>{{ playlists|length }} on your account</p>
   </div>
 </div>
 
@@ -25,21 +25,23 @@
            data-search="{{ playlist.name|lower }} {{ playlist.owner|lower }}">
           <div class="tile-art">
             {% if playlist.image %}
-              <img src="{{ playlist.image }}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+              <img src="{{ playlist.image }}"
+                   {% if playlist.srcset %}srcset="{{ playlist.srcset }}" sizes="(min-width: 700px) 160px, 120px"{% endif %}
+                   alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
             {% else %}
               <span class="art-empty" aria-hidden="true">{% include 'partials/icons/list.svg' %}</span>
             {% endif %}
           </div>
-          <div class="tile-name">{{ playlist.name }}</div>
-          <div class="tile-sub">
+          <span class="tile-head"><span class="tile-name">{{ playlist.name }}</span></span>
+          <span class="tile-sub">
             {{ playlist.track_count }} {{ 'track' if playlist.track_count == 1 else 'tracks' }}
             {%- if playlist.collaborative %} · collaborative{% elif playlist.public %} · public{% endif %}
-          </div>
+          </span>
         </a>
       </li>
     {% endfor %}
   </ul>
-  <p class="empty" data-no-results hidden><strong>No playlists match that filter.</strong></p>
+  <p class="empty" data-no-results hidden>No playlists match that filter.</p>
 {% else %}
   <div class="empty">
     <h2>No playlists</h2>

@@ -23,7 +23,7 @@
   <ul class="card-grid" id="artist-grid" data-chart="artists" data-range="{{ time_range }}">
     {% for artist in artists %}{% include 'partials/artist_tile.html' %}{% endfor %}
   </ul>
-  <p class="empty" data-no-results hidden><strong>No artists match that filter.</strong></p>
+  <p class="empty" data-no-results hidden>No artists match that filter.</p>
 {% else %}
   {% include 'partials/empty_top.html' %}
 {% endif %}

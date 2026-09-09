@@ -22,6 +22,7 @@ screen and it runs full-screen like a native app — no app store, one codebase.
 | **Taste profile** | Obscurity score, average release year and decade, average track length, explicit share |
 | **Now playing** | A live widget that polls while the tab is visible |
 | **Save as playlist** | Push the current top-tracks chart straight to your Spotify account |
+| **Installable** | Add to home screen on iOS or Android; runs full-screen with an offline notice |
 | **Time ranges** | Last 4 weeks, last 6 months, all time — on every chart |
 
 ### Movement arrows
@@ -129,6 +130,47 @@ when the connection drops.
 
 ---
 
+## Design and performance
+
+The interface follows three rules borrowed from [Vercel's Geist](https://vercel.com/geist/colors)
+and [Linear](https://linear.app):
+
+1. **Every neutral has one job.** A ten-step ramp where 100–300 are surfaces,
+   400–500 are borders, 900 is secondary text and 1000 is primary. A colour is
+   never picked by eye.
+2. **Spacing and radii come from a scale.** A 4px spacing base and exactly
+   three radii — 6px controls, 12px cards, pill.
+3. **Structure comes from hairline borders, not shadows,** and there is a
+   single accent colour, reserved for the active nav item, the primary button,
+   focus rings and now-playing.
+
+Type is a system stack: SF on Apple platforms, Segoe UI on Windows, Roboto on
+Android. All three are high-quality UI faces and none costs a font download,
+which matters more here than a bespoke typeface would.
+
+### Transfer size
+
+Measured on `/dashboard` with a 25-item chart:
+
+| | before | after |
+|---|---|---|
+| HTML | 26,389 B | 3,650 B |
+| CSS | 23,942 B | 5,594 B |
+| JS | 11,123 B | 3,695 B |
+| **total** | **61,454 B** | **12,939 B** |
+
+A 79% reduction, from four changes:
+
+- **gzip** on HTML, CSS, JS and JSON (`spotifystats/performance.py`).
+- **Immutable caching** on static assets, made safe by stamping each URL with
+  a content hash, so a repeat visit transfers only the HTML.
+- **`srcset` on every thumbnail**, so a phone fetches Spotify's 64px artwork
+  for a 36px slot instead of the 640px file.
+- **`content-visibility` on list rows**, so the browser skips layout for the
+  rows below the fold on a 50-item chart.
+
+---
+
 ## Configuration
 
 | Variable | Default | Purpose |
@@ -154,6 +196,7 @@ spotifystats/
   spotify.py         OAuth, token refresh, per-user response cache
   shaping.py         pure functions that turn API payloads into view models
   data.py            fetch-and-shape helpers used by the views
+  performance.py     gzip, immutable asset caching, cache-busted URLs
   blueprints/
     auth.py          /login, /callback, /logout
     pages.py         the six HTML pages
@@ -182,7 +225,13 @@ The suite runs entirely against a fake Spotify client, so it needs no
 credentials and no network. It covers payload shaping, genre ranking, paging
 past Spotify's 50-item cap, per-user caching, the OAuth state check, token
 refresh and refresh failure, the redirect guard on `/refresh`, every page and
-API endpoint, and the empty-state and error paths.
+API endpoint, compression and cache headers, `srcset` generation, and the
+empty-state and error paths.
+
+The UI is also checked in Chromium at 320, 390, 768, 1280 and 1920px for
+horizontal overflow and console errors, plus a scripted interaction pass over
+filtering, movement arrows, playlist export, now-playing, range switching and
+keyboard focus order.
 
 ---
 

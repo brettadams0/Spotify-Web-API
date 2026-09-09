@@ -2,60 +2,68 @@
 {% block title %}Spotify Stats — your listening, in detail{% endblock %}
 
 {% block public_content %}
-<section class="landing">
-  <div class="landing-inner">
-    <span class="brand">{% include 'partials/logo.svg' %}<span>Spotify<strong>Stats</strong></span></span>
+<div class="landing">
+  <header class="landing-bar">
+    <span class="brand">{% include 'partials/logo.svg' %}<span>Spotify <strong>Stats</strong></span></span>
+  </header>
 
-    <h1>Your listening history, <em>finally readable</em>.</h1>
-    <p class="lede">
-      Sign in with Spotify to see your top artists, tracks and genres across three
-      time ranges, browse everything you played recently, and turn any chart into
-      a playlist in one tap.
-    </p>
+  <div class="landing-main">
+    <div class="landing-hero">
+      <h1>Your listening history, in detail.</h1>
+      <p class="lede">
+        Top artists, tracks and genres across three time ranges. Every play
+        from the last two days with a timestamp. Any chart saved to a real
+        playlist in one tap.
+      </p>
 
-    <div class="landing-cta">
+      <div class="landing-cta">
+        {% if credentials_configured %}
+          <a class="btn btn-primary btn-lg" href="{{ url_for('auth.login') }}">Log in with Spotify</a>
+        {% else %}
+          <button class="btn btn-primary btn-lg" disabled>Log in with Spotify</button>
+        {% endif %}
+      </div>
+
       {% if credentials_configured %}
-        <a class="btn btn-primary btn-lg" href="{{ url_for('auth.login') }}">Log in with Spotify</a>
+        <p class="landing-note">
+          Read-only. Nothing is stored on a server — sign out and it is gone.
+        </p>
       {% else %}
-        <button class="btn btn-primary btn-lg" disabled>Log in with Spotify</button>
+        <p class="landing-note">
+          No Spotify credentials are configured on this deployment. Set
+          <code>SPOTIFY_CLIENT_ID</code> and <code>SPOTIFY_CLIENT_SECRET</code>,
+          then restart.
+        </p>
       {% endif %}
-    </div>
 
-    {% if credentials_configured %}
-      <p class="landing-note">
-        Read-only access to your listening data. Nothing is stored on a server —
-        sign out and it is gone.
-      </p>
-    {% else %}
-      <p class="landing-note">
-        This deployment has no Spotify credentials configured yet. Set
-        <code>SPOTIFY_CLIENT_ID</code> and <code>SPOTIFY_CLIENT_SECRET</code>,
-        then restart.
-      </p>
-    {% endif %}
+    </div>
 
     <div class="feature-grid">
-      <article class="feature">
-        {% include 'partials/icons/artist.svg' %}
-        <h2>Top artists &amp; tracks</h2>
-        <p>Your full top 50 for the last 4 weeks, 6 months, or all time.</p>
-      </article>
-      <article class="feature">
-        {% include 'partials/icons/genre.svg' %}
-        <h2>Genre breakdown</h2>
-        <p>Ranked across your top artists so you can see what you actually listen to.</p>
-      </article>
-      <article class="feature">
-        {% include 'partials/icons/clock.svg' %}
-        <h2>Recent plays</h2>
-        <p>Your last 50 tracks, each with the exact time you played it.</p>
-      </article>
-      <article class="feature">
-        {% include 'partials/icons/list.svg' %}
-        <h2>Save as playlist</h2>
-        <p>Push any top-tracks chart straight to your Spotify account.</p>
-      </article>
+        <article class="feature">
+          {% include 'partials/icons/artist.svg' %}
+          <h2>Charts that move</h2>
+          <p>Your top 50 artists and tracks, with what rose and fell since your last visit.</p>
+        </article>
+        <article class="feature">
+          {% include 'partials/icons/genre.svg' %}
+          <h2>Genres, weighted</h2>
+          <p>Ranked so a genre carried by your #1 artist outranks one carried by your #40.</p>
+        </article>
+        <article class="feature">
+          {% include 'partials/icons/clock.svg' %}
+          <h2>Play history</h2>
+          <p>Your last 50 plays, each with the exact time, shown in your local clock.</p>
+        </article>
+        <article class="feature">
+          {% include 'partials/icons/list.svg' %}
+          <h2>Export</h2>
+          <p>Push any top-tracks chart straight to your Spotify account as a playlist.</p>
+        </article>
     </div>
   </div>
-</section>
+
+  <footer class="footer">
+    <p>Not affiliated with Spotify AB.</p>
+  </footer>
+</div>
 {% endblock %}

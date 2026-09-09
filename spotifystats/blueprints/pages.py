@@ -67,6 +67,8 @@ def dashboard():
         stats=overview["stats"],
         artists=overview["artists"][:10],
         tracks=overview["tracks"][:10],
+        artist_total=len(overview["artists"]),
+        track_total=len(overview["tracks"]),
         genres=overview["genres"],
     )
 
@@ -88,10 +90,17 @@ def artists():
 def tracks():
     """Full top-tracks chart, with playlist export."""
     time_range = _range_from_query()
+    tracks = data.get_top_tracks(time_range)
+    explicit = (
+        round(sum(1 for t in tracks if t["explicit"]) / len(tracks) * 100)
+        if tracks
+        else 0
+    )
     return render_template(
         "tracks.html",
         time_range=time_range,
-        tracks=data.get_top_tracks(time_range),
+        tracks=tracks,
+        explicit_share=explicit,
     )
 
 
