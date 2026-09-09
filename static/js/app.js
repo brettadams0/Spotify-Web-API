@@ -274,6 +274,10 @@
   function markBroken(el) {
     if (!el || el.classList.contains('is-broken')) return;
     el.classList.add('is-broken');
+    // srcset wins over src, so it has to go first or the browser just keeps
+    // retrying the candidate list and the broken-image glyph stays put.
+    el.removeAttribute('srcset');
+    el.removeAttribute('sizes');
     el.src = BLANK_PIXEL;
   }
 

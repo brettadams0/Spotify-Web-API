@@ -26,6 +26,27 @@ def pick_image(images: Iterable[dict[str, Any]] | None, minimum: int = 160) -> s
     return ordered[-1]["url"]
 
 
+def image_srcset(images: Iterable[dict[str, Any]] | None) -> str:
+    """Build a srcset from Spotify's image list.
+
+    Spotify returns the same artwork at three sizes. Handing all of them to
+    the browser lets it fetch a 64px file for a 36px thumbnail instead of the
+    640px one, which is the single largest transfer saving on these pages.
+    """
+    seen: set[int] = set()
+    parts: list[str] = []
+    for img in sorted(
+        (i for i in (images or []) if i and i.get("url") and i.get("width")),
+        key=lambda i: i["width"],
+    ):
+        width = int(img["width"])
+        if width in seen:
+            continue
+        seen.add(width)
+        parts.append(f"{img['url']} {width}w")
+    return ", ".join(parts)
+
+
 def format_duration(ms: int | None) -> str:
     """Render a millisecond duration as m:ss (or h:mm:ss when long)."""
     if not ms or ms < 0:
@@ -115,6 +136,7 @@ def shape_artist(artist: dict[str, Any], rank: int | None = None) -> dict[str, A
         "id": artist.get("id"),
         "name": artist.get("name") or "Unknown artist",
         "image": pick_image(artist.get("images")),
+        "srcset": image_srcset(artist.get("images")),
         "genres": artist.get("genres") or [],
         "popularity": artist.get("popularity"),
         "followers": (artist.get("followers") or {}).get("total"),
@@ -136,6 +158,7 @@ def shape_track(track: dict[str, Any], rank: int | None = None) -> dict[str, Any
         "artist_label": ", ".join(artists) or "Unknown artist",
         "album": album.get("name"),
         "image": pick_image(album.get("images")),
+        "srcset": image_srcset(album.get("images")),
         "year": release_year(album),
         "duration": format_duration(track.get("duration_ms")),
         "duration_ms": track.get("duration_ms") or 0,
@@ -153,6 +176,7 @@ def shape_playlist(playlist: dict[str, Any]) -> dict[str, Any]:
         "id": playlist.get("id"),
         "name": playlist.get("name") or "Untitled playlist",
         "image": pick_image(playlist.get("images")),
+        "srcset": image_srcset(playlist.get("images")),
         "description": playlist.get("description") or "",
         "track_count": (playlist.get("tracks") or {}).get("total") or 0,
         "owner": owner.get("display_name") or owner.get("id") or "",
@@ -186,6 +210,7 @@ def shape_profile(profile: dict[str, Any]) -> dict[str, Any]:
         "product": profile.get("product"),
         "followers": (profile.get("followers") or {}).get("total") or 0,
         "image": pick_image(profile.get("images"), minimum=200),
+        "srcset": image_srcset(profile.get("images")),
         "url": (profile.get("external_urls") or {}).get("spotify"),
     }
 

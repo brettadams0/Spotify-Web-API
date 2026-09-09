@@ -5,14 +5,14 @@
 <div class="page-head">
   <div>
     <h1>Recently played</h1>
-    <p>Your last {{ plays|length }} plays, newest first</p>
+    <p>{{ plays|length }} plays, newest first</p>
   </div>
 </div>
 
 <div class="toolbar">
   <div class="grow">
     <label class="visually-hidden" for="filter">Filter recent plays</label>
-    <input class="search" id="filter" type="search" placeholder="Filter recent plays…"
+    <input class="search" id="filter" type="search" placeholder="Filter plays…"
            data-filter-target="#recent-list" autocomplete="off">
   </div>
 </div>
@@ -24,8 +24,10 @@
           data-search="{{ play.name|lower }} {{ play.artist_label|lower }} {{ (play.album or '')|lower }}">
         <span class="rank-num">{{ loop.index }}</span>
         {% if play.image %}
-          <img class="rank-art" src="{{ play.image }}" alt="" width="48" height="48"
-               loading="lazy" decoding="async" referrerpolicy="no-referrer">
+          <img class="rank-art" src="{{ play.image }}"
+               {% if play.srcset %}srcset="{{ play.srcset }}" sizes="36px"{% endif %}
+               alt="" width="36" height="36" loading="lazy" decoding="async"
+               referrerpolicy="no-referrer">
         {% else %}
           <span class="rank-art art-empty" aria-hidden="true">
             {% include 'partials/icons/track.svg' %}
@@ -45,7 +47,7 @@
       </li>
     {% endfor %}
   </ul>
-  <p class="empty" data-no-results hidden><strong>No plays match that filter.</strong></p>
+  <p class="empty" data-no-results hidden>No plays match that filter.</p>
 {% else %}
   <div class="empty">
     <h2>No recent plays</h2>
