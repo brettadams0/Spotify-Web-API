@@ -113,6 +113,27 @@ docker build -t spotify-stats .
 docker run -p 8000:8000 --env-file .env spotify-stats
 ```
 
+### Vercel
+
+The repo carries a Vercel entrypoint too, so the same code deploys either way.
+`pyproject.toml` points Vercel at `wsgi:app` — the identical callable gunicorn
+serves on Render and in Docker — and `vercel.json` raises the function budget
+to 60s, because loading the dashboard makes three sequential Spotify calls.
+
+Import the repo at [vercel.com/new](https://vercel.com/new), then set
+`SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REDIRECT_URI`,
+`SECRET_KEY` and `SESSION_COOKIE_SECURE=true` under **Settings → Environment
+Variables**.
+
+**Which to pick.** Render runs one long-lived process, so the response cache in
+`spotify.py` works as designed. Vercel runs the app as a serverless function,
+where each instance holds its own cache — that costs a few more Spotify API
+calls but nothing else, since the cache is a pure optimisation and no request
+depends on it. The practical trade is the other way round: Render's free tier
+sleeps after ~15 minutes and takes ~30s to wake, which is painful for an app
+you open from your phone a few times a day. Vercel has no such sleep. For
+phone-first use, prefer Vercel.
+
 ### Fly.io / Railway / Heroku
 
 The `Procfile` covers all three:
@@ -208,7 +229,7 @@ static/
   sw.js              service worker (offline shell)
   manifest.webmanifest
 tests/               pytest suite, no network required
-wsgi.py              production entry point
+wsgi.py              production entry point (gunicorn, and Vercel's entrypoint)
 app.py               development entry point
 ```
 

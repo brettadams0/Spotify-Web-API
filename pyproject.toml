@@ -1,0 +1,8 @@
+# Vercel discovers the WSGI callable through this entrypoint. It is the same
+# `wsgi:app` that gunicorn serves on Render and in Docker, so the three
+# deployment targets all run byte-identical application code.
+#
+# Dependencies still come from requirements.txt; no [project] table is defined
+# here so nothing changes for pip.
+[tool.vercel]
+entrypoint = "wsgi:app"
